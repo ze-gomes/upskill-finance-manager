@@ -11,6 +11,10 @@ public class SavingsAccount extends Account {
         super(numConta, name);
     }
 
+    public SavingsAccount(long numConta, String name, Currency moeda){
+        super(numConta, name, moeda);
+    }
+
     public SavingsAccount(long numConta, String name, Currency moeda, Date startDate, Date endDate){
         super(numConta, name, moeda, startDate, endDate);
     }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
+import static pt.upskill.projeto2.financemanager.date.Date.intToMonth;
 
 public abstract class Account {
     Currency moeda;
@@ -24,7 +25,6 @@ public abstract class Account {
     Date endDate;
     Date accountInfo;
     ArrayList<StatementLine> statements;
-    double currentBalance;
     BanksConstants banksConstants;
 
     public Account(long id, String name) {
@@ -32,7 +32,15 @@ public abstract class Account {
         this.name = name;
         this.accountInfo = new Date();
         this.statements = new ArrayList<>();
-        this.currentBalance = 0.0;
+        this.banksConstants = new BanksConstants();
+    }
+
+    public Account(long id, String name, Currency moeda) {
+        this.id = id;
+        this.name = name;
+        this.moeda = moeda;
+        this.accountInfo = new Date();
+        this.statements = new ArrayList<>();
         this.banksConstants = new BanksConstants();
     }
 
@@ -55,7 +63,6 @@ public abstract class Account {
         long id = 0;
         String name = "", accType = "";
         Currency moeda = null;
-        Date startDate = null, endDate = null;
         Account account = null;
         Scanner s = new Scanner(f);
         while (s.hasNextLine()) {
@@ -65,19 +72,18 @@ public abstract class Account {
             // Account general info
             if (identifierWord.equals("Account")) {
                 id = Long.parseLong(lineFormatted[1]);
-                System.out.println("num conta invalido");
                 moeda = Currency.valueOf(lineFormatted[2]);
                 name = lineFormatted[3];
                 accType = lineFormatted[4];
                 if (accType.equals("DraftAccount"))
-                    account = new DraftAccount(id, name, moeda, startDate, endDate);
+                    account = new DraftAccount(id, name, moeda);
                 else if (accType.equals("SavingsAccount"))
-                    account =  new SavingsAccount(id, name, moeda, startDate, endDate);
+                    account =  new SavingsAccount(id, name, moeda);
                 // Account Dates
             } else if (identifierWord.equals("StartDate")) {
-                startDate = new Date(format.parse(lineFormatted[1]));
+                account.startDate = new Date(format.parse(lineFormatted[1]));
             } else if (identifierWord.equals("EndDate")) {
-                endDate = new Date(format.parse(lineFormatted[1]));
+                account.endDate = new Date(format.parse(lineFormatted[1]));
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
                 break;
@@ -95,12 +101,29 @@ public abstract class Account {
     }
 
     public double currentBalance() {
-        return currentBalance;
+        double balance = getStartingBalance();
+        for (StatementLine statement: statements) {
+            balance += statement.getDraft();
+            balance += statement.getCredit();
+        }
+        return balance;
     }
 
-    //Account.newAccount(new File("src/pt/upskill/projeto2/financemanager/account_info_test/1234567890987.csv"));
+
+    // Find the starting balance of an account from a list of statements
+    public double getStartingBalance() {
+        for (StatementLine statement: statements) {
+            if (statement.getDate().equals(this.startDate)){
+                return statement.getAvailableBalance();
+            }
+        }
+        return 0.0;
+    }
+
 
     public void addStatementLine(StatementLine statement) {
+        //currentBalance += statement.getDraft();
+        //currentBalance += statement.getCredit();
         statements.add(statement);
     }
 
@@ -136,8 +159,15 @@ public abstract class Account {
         return 0;
     }
 
-    public double totalForMonth(int i, int i1) {
-        return 0.0;
+    public double totalForMonth(int month, int year) {
+        double totalMonth = 0.0;
+        for (StatementLine statement: statements) {
+            if (statement.getDate().getYear() == year && statement.getDate().getMonth() ==  intToMonth(month)){
+                totalMonth += statement.getDraft();
+                totalMonth += statement.getCredit();
+            }
+        }
+        return totalMonth;
     }
 
     public void autoCategorizeStatements(List<Category> categories) {

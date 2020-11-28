@@ -81,4 +81,7 @@ public class StatementLine {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+
+
 }
