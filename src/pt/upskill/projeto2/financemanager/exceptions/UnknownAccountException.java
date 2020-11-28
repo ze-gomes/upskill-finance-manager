@@ -1,4 +1,4 @@
 package pt.upskill.projeto2.financemanager.exceptions;
 
-public class UnknownAccountException {
+public class UnknownAccountException extends Exception {
 }

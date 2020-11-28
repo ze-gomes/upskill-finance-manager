@@ -16,7 +16,7 @@ public class Category {
     private static final long serialVersionUID = -9107819223195202547L;
 
     public Category(String string) {
-        // TODO Auto-generated constructor stub
+        this.name = name;
     }
 
     /**
