@@ -1,6 +1,7 @@
 package pt.upskill.projeto2.financemanager.categories;
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,13 +10,12 @@ import java.util.List;
  * ...
  */
 
-public class Category {
-
+public class Category implements Serializable {
     private String name;
-    private List<String> tags;
+    private List<String> tags = new ArrayList<String>();
     private static final long serialVersionUID = -9107819223195202547L;
 
-    public Category(String string) {
+    public Category(String name) {
         this.name = name;
     }
 
@@ -27,8 +27,20 @@ public class Category {
      * @return uma lista de categorias, geradas ao ler o ficheiro
      */
     public static List<Category> readCategories(File file) {
-        // TODO Auto-generated method stub
-        return null;
+        List<Category> listaCat = null;
+        try {
+            FileInputStream fileIn = new FileInputStream(file);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            listaCat = (List<Category>) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            System.out.println("Class not found");
+            c.printStackTrace();
+        }
+        return listaCat;
     }
 
     /**
@@ -38,22 +50,27 @@ public class Category {
      * @param categories
      */
     public static void writeCategories(File file, List<Category> categories) {
-        // TODO completar o código da função
+        try {
+            FileOutputStream fileOut = new FileOutputStream(file);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(categories);
+            out.close();
+            fileOut.close();
+            System.out.printf("Serialized data is saved in /categories");
+        } catch (IOException i) {
+            i.printStackTrace();
+        }
     }
 
     public boolean hasTag(String tag) {
-        // TODO Auto-generated method stub
-        return false;
+        return tags.contains(tag);
     }
 
     public void addTag(String tag) {
-        // TODO Auto-generated method stub
-
+        tags.add(tag);
     }
 
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return name;
     }
-
 }

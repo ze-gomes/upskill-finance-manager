@@ -1,6 +1,11 @@
 package pt.upskill.projeto2.financemanager;
-// TODO
+
+import pt.upskill.projeto2.utils.Menu;
+
 public class PersonalFinanceManager {
 	// TODO
+    Menu menu = new Menu();
+
+
 
 }

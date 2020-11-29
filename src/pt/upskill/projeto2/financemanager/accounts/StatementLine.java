@@ -34,12 +34,13 @@ public class StatementLine {
     }
 
 
-    public static StatementLine newStatementLine(String[] lineFormatted) throws FileNotFoundException, NumberFormatException, ParseException, IllegalArgumentException {
+    public static StatementLine newStatementLine(String line) throws FileNotFoundException, NumberFormatException, ParseException, IllegalArgumentException {
+        String[] lineFormatted = line.split(";");
         // Date formatter
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date date = new Date(format.parse(lineFormatted[0]));
         Date valueDate = new Date(format.parse(lineFormatted[1]));
-        String description = lineFormatted[2];
+        String description = lineFormatted[2].trim();
         double draft = Double.parseDouble(lineFormatted[3]);
         double credit = Double.parseDouble(lineFormatted[4]);
         double accountingBalance = Double.parseDouble(lineFormatted[5]);

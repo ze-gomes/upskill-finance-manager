@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Scanner;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
@@ -58,7 +59,8 @@ public abstract class Account {
         Account account = null;
         Scanner s = new Scanner(f);
         while (s.hasNextLine()) {
-            String[] lineFormatted = s.nextLine().replaceAll("\\s+", "").split(";");
+            String line = s.nextLine();
+            String[] lineFormatted = line.replaceAll("\\s+", "").split(";");
             String identifierWord = lineFormatted[0];
             // Take first word of array as identifier word
             // Account general info
@@ -79,7 +81,7 @@ public abstract class Account {
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
             } else if (statementLines) {
-                StatementLine statement = newStatementLine(lineFormatted);
+                StatementLine statement = newStatementLine(line);
                 account.addStatementLine(statement);
             }
         }
@@ -93,7 +95,6 @@ public abstract class Account {
 
     public double currentBalance() {
         double balance = 0.0;
-        System.out.println(statements.toString());
         for (int i=0; i<statements.size(); i++){
             if (i==0) {
                 balance = statements.get(i).getAvailableBalance();
@@ -101,20 +102,18 @@ public abstract class Account {
             }
             balance += statements.get(i).getDraft();
             balance += statements.get(i).getCredit();
-            System.out.println("Balance at " + i + "  " + balance);
         }
         return balance;
     }
 
 
-    // Find the starting balance of an account from a list of statements
-    public double getStartingBalance() {
-        return statements.get(0).getAvailableBalance();
-    }
-
 
     public BanksConstants getBanksConstants() {
         return banksConstants;
+    }
+
+    public ArrayList<StatementLine> getStatements(){
+        return statements;
     }
 
     public void addStatementLine(StatementLine statement) {
@@ -158,13 +157,8 @@ public abstract class Account {
         return startDate;
     }
 
-    public ArrayList<StatementLine> getStatements() {
-        return statements;
-    }
-
     public double estimatedAverageBalance() {
         double balance = 0.0;
-        System.out.println(statements.toString());
         for (int i=0; i<statements.size(); i++){
             if (i==0) {
                 balance = statements.get(i).getAvailableBalance();
@@ -172,7 +166,6 @@ public abstract class Account {
             }
             balance += statements.get(i).getDraft();
             balance += statements.get(i).getCredit();
-            System.out.println("Balance at " + i + "  " + balance);
         }
         return balance;
     }
@@ -181,9 +174,18 @@ public abstract class Account {
 
     public abstract void setInterestRate(double interestRate);
 
-    public int totalDraftsForCategorySince(Category category, Date date) {
-        // TODO
-        return 0;
+    public double totalDraftsForCategorySince(Category category, Date date) {
+        double totalDrafts = 0.0;
+        for ( StatementLine statement : statements) {
+            // Null Category, doesn't matter
+            if (statement.getCategory() == null){
+                continue;
+            }
+            if (statement.getDate().compareTo(date) > 0 && statement.getCategory().getName().equals(category.getName())){
+                totalDrafts += statement.getDraft();
+            }
+        }
+        return totalDrafts;
     }
 
     public double totalForMonth(int month, int year) {
@@ -197,12 +199,31 @@ public abstract class Account {
     }
 
     public void autoCategorizeStatements(List<Category> categories) {
-        //TODO
+        System.out.println(statements.toString());
+        for (StatementLine statement : statements) {
+            for (Category cat: categories) {
+                if ( cat.hasTag(statement.getDescription())){
+                    statement.setCategory(cat);
+                }
+            }
+        }
     }
 
     public void removeStatementLinesBefore(Date date) {
-        // TODO
+        // Need to use a iterator to remove from list concurrently
+        ListIterator<StatementLine> statementsIterator = statements.listIterator();
+        while(statementsIterator.hasNext()){
+            if(statementsIterator.next().getDate().compareTo(date) < 0){
+                statementsIterator.remove();
+            }
+        }
+//        for ( StatementLine statement : statements) {
+//            if (statement.getDate().compareTo(date) < 0){
+//                statements
+//            }
+//        }
     }
+
 
 
     public static void main(String[] args) {
