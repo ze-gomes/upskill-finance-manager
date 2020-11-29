@@ -26,7 +26,7 @@ public abstract class Account {
     private Date accountInfo = new Date();
     private ArrayList<StatementLine> statements = new ArrayList<StatementLine>();
     private BanksConstants banksConstants = new BanksConstants();
-    private double balance;
+
 
     public Account(long id, String name) {
         this.id = id;
@@ -92,12 +92,17 @@ public abstract class Account {
     }
 
     public double currentBalance() {
-        //double balance = getStartingBalance();
-        System.out.println(balance + " BALANCE");
-//        for (StatementLine statement: statements) {
-//            balance += statement.getDraft();
-//            balance += statement.getCredit();
-//        }
+        double balance = 0.0;
+        System.out.println(statements.toString());
+        for (int i=0; i<statements.size(); i++){
+            if (i==0) {
+                balance = statements.get(i).getAvailableBalance();
+                continue;
+            }
+            balance += statements.get(i).getDraft();
+            balance += statements.get(i).getCredit();
+            System.out.println("Balance at " + i + "  " + balance);
+        }
         return balance;
     }
 
@@ -113,9 +118,24 @@ public abstract class Account {
     }
 
     public void addStatementLine(StatementLine statement) {
-        balance += statement.getDraft();
-        balance += statement.getCredit();
+        if (statements.size()==0){
+            setStartDate(statement.getDate());
+            setEndDate(statement.getDate());
+        }
         statements.add(statement);
+        if (statement.getDate().compareTo(getStartDate()) < 0){
+            setStartDate(statement.getDate());
+        } else if (statement.getDate().compareTo(getEndDate()) > 0) {
+            setEndDate(statement.getDate());
+        }
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public long getId() {
@@ -143,8 +163,18 @@ public abstract class Account {
     }
 
     public double estimatedAverageBalance() {
-        // TODO
-        return 0;
+        double balance = 0.0;
+        System.out.println(statements.toString());
+        for (int i=0; i<statements.size(); i++){
+            if (i==0) {
+                balance = statements.get(i).getAvailableBalance();
+                continue;
+            }
+            balance += statements.get(i).getDraft();
+            balance += statements.get(i).getCredit();
+            System.out.println("Balance at " + i + "  " + balance);
+        }
+        return balance;
     }
 
     public abstract double getInterestRate();
