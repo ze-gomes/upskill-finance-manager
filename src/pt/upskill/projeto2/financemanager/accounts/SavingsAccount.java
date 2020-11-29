@@ -21,12 +21,12 @@ public class SavingsAccount extends Account {
 
     @Override
     public double getInterestRate() {
-        return banksConstants.savingsInterestRate();
+        return getBanksConstants().savingsInterestRate();
     }
 
     @Override
     public void setInterestRate(double interestRate) {
-        banksConstants.setSavingsInterestRate(interestRate);
+        getBanksConstants().setSavingsInterestRate(interestRate);
     }
 
 }

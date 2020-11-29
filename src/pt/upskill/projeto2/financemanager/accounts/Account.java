@@ -17,31 +17,26 @@ import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newState
 import static pt.upskill.projeto2.financemanager.date.Date.intToMonth;
 
 public abstract class Account {
-    Currency moeda;
-    long id;
-    String name;
-    String additionalInfo = "";
-    Date startDate;
-    Date endDate;
-    Date accountInfo;
-    ArrayList<StatementLine> statements;
-    BanksConstants banksConstants;
+    private Currency moeda;
+    private long id;
+    private String name;
+    private String additionalInfo = "";
+    private Date startDate;
+    private Date endDate;
+    private Date accountInfo = new Date();
+    private ArrayList<StatementLine> statements = new ArrayList<StatementLine>();
+    private BanksConstants banksConstants = new BanksConstants();
+    private double balance;
 
     public Account(long id, String name) {
         this.id = id;
         this.name = name;
-        this.accountInfo = new Date();
-        this.statements = new ArrayList<>();
-        this.banksConstants = new BanksConstants();
     }
 
     public Account(long id, String name, Currency moeda) {
         this.id = id;
         this.name = name;
         this.moeda = moeda;
-        this.accountInfo = new Date();
-        this.statements = new ArrayList<>();
-        this.banksConstants = new BanksConstants();
     }
 
     public Account(long id, String name, Currency moeda, Date startDate, Date endDate) {
@@ -50,9 +45,6 @@ public abstract class Account {
         this.moeda = moeda;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.accountInfo = new Date();
-        this.statements = new ArrayList<>();
-        this.banksConstants = new BanksConstants();
     }
 
     public static Account newAccount(File f) throws FileNotFoundException, BadFormatException, ParseException, UnknownAccountException {
@@ -86,7 +78,6 @@ public abstract class Account {
                 account.endDate = new Date(format.parse(lineFormatted[1]));
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
-                break;
             } else if (statementLines) {
                 StatementLine statement = newStatementLine(lineFormatted);
                 account.addStatementLine(statement);
@@ -101,29 +92,29 @@ public abstract class Account {
     }
 
     public double currentBalance() {
-        double balance = getStartingBalance();
-        for (StatementLine statement: statements) {
-            balance += statement.getDraft();
-            balance += statement.getCredit();
-        }
+        //double balance = getStartingBalance();
+        System.out.println(balance + " BALANCE");
+//        for (StatementLine statement: statements) {
+//            balance += statement.getDraft();
+//            balance += statement.getCredit();
+//        }
         return balance;
     }
 
 
     // Find the starting balance of an account from a list of statements
     public double getStartingBalance() {
-        for (StatementLine statement: statements) {
-            if (statement.getDate().equals(this.startDate)){
-                return statement.getAvailableBalance();
-            }
-        }
-        return 0.0;
+        return statements.get(0).getAvailableBalance();
     }
 
 
+    public BanksConstants getBanksConstants() {
+        return banksConstants;
+    }
+
     public void addStatementLine(StatementLine statement) {
-        //currentBalance += statement.getDraft();
-        //currentBalance += statement.getCredit();
+        balance += statement.getDraft();
+        balance += statement.getCredit();
         statements.add(statement);
     }
 
@@ -147,7 +138,12 @@ public abstract class Account {
         return startDate;
     }
 
+    public ArrayList<StatementLine> getStatements() {
+        return statements;
+    }
+
     public double estimatedAverageBalance() {
+        // TODO
         return 0;
     }
 
@@ -156,6 +152,7 @@ public abstract class Account {
     public abstract void setInterestRate(double interestRate);
 
     public int totalDraftsForCategorySince(Category category, Date date) {
+        // TODO
         return 0;
     }
 
@@ -164,24 +161,29 @@ public abstract class Account {
         for (StatementLine statement: statements) {
             if (statement.getDate().getYear() == year && statement.getDate().getMonth() ==  intToMonth(month)){
                 totalMonth += statement.getDraft();
-                totalMonth += statement.getCredit();
             }
         }
         return totalMonth;
     }
 
     public void autoCategorizeStatements(List<Category> categories) {
+        //TODO
     }
 
     public void removeStatementLinesBefore(Date date) {
+        // TODO
     }
 
+
+    public static void main(String[] args) {
+        try {
+            File f = new File("src/pt/upskill/projeto2/financemanager/account_info_test/1234567890989.csv");
+            System.out.println(f.exists());
+            Account acc = Account.newAccount(f);
+            System.out.println(acc.statements.size());
+        } catch (Exception e){
+        }
+    }
 }
 
-
-//String description, double draft, double credit, double accountingBalance, double availableBalance, Category category
-//Date ;Value Date ;Description ;Draft ;Credit ;Accounting balance ;Available balance
-//31-10-2013 ;31-10-2013 ;SUMMARY ;0.0 ;200.0 ;2600.0 ;2600.0
-
-//(new pt.upskill.projeto2.financemanager.date.Date(1, 1, 2014), new pt.upskill.projeto2.financemanager.date.Date(1, 1, 2014), "description", 0.0, 22, 1520, 1542, null));
 

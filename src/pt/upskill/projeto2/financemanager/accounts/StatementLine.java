@@ -19,7 +19,10 @@ public class StatementLine {
     Category category;
 
 
-    public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) {
+    public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) throws IllegalArgumentException {
+        if (date == null || valueDate == null || description == null || description.equals("") || credit < 0.0 || draft > 0.0){
+            throw new IllegalArgumentException();
+        }
         this.date = date;
         this.valueDate = valueDate;
         this.description = description;
@@ -31,19 +34,17 @@ public class StatementLine {
     }
 
 
-    public static StatementLine newStatementLine(String[] lineFormatted) throws FileNotFoundException, NumberFormatException, ParseException {
+    public static StatementLine newStatementLine(String[] lineFormatted) throws FileNotFoundException, NumberFormatException, ParseException, IllegalArgumentException {
         // Date formatter
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date date = new Date(format.parse(lineFormatted[0]));
-        System.out.println(date.toString());
         Date valueDate = new Date(format.parse(lineFormatted[1]));
         String description = lineFormatted[2];
         double draft = Double.parseDouble(lineFormatted[3]);
         double credit = Double.parseDouble(lineFormatted[4]);
         double accountingBalance = Double.parseDouble(lineFormatted[5]);
         double availableBalance = Double.parseDouble(lineFormatted[6]);
-        Category category = new Category(lineFormatted[7]);
-        return new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, category);
+        return new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, null);
     }
 
     public Date getDate() {
@@ -82,6 +83,16 @@ public class StatementLine {
         this.category = category;
     }
 
-
-
+    @Override
+    public String toString() {
+        return  "date=" + date +
+                ", valueDate=" + valueDate +
+                ", description='" + description + '\'' +
+                ", draft=" + draft +
+                ", credit=" + credit +
+                ", accountingBalance=" + accountingBalance +
+                ", availableBalance=" + availableBalance +
+                ", category=" + category +
+                '}';
+    }
 }

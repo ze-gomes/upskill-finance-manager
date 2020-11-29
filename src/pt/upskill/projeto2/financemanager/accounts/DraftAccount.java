@@ -20,12 +20,12 @@ public class DraftAccount extends Account {
 
     @Override
     public double getInterestRate() {
-        return banksConstants.normalInterestRate();
+        return getBanksConstants().normalInterestRate();
     }
 
     @Override
     public void setInterestRate(double interestRate) {
-        banksConstants.setNormalInterestRate(interestRate);
+        getBanksConstants().setNormalInterestRate(interestRate);
     }
 
 
