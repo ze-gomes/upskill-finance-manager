@@ -170,6 +170,10 @@ public abstract class Account {
         return balance;
     }
 
+    public Currency getMoeda() {
+        return moeda;
+    }
+
     public abstract double getInterestRate();
 
     public abstract void setInterestRate(double interestRate);
@@ -217,11 +221,6 @@ public abstract class Account {
                 statementsIterator.remove();
             }
         }
-//        for ( StatementLine statement : statements) {
-//            if (statement.getDate().compareTo(date) < 0){
-//                statements
-//            }
-//        }
     }
 
 

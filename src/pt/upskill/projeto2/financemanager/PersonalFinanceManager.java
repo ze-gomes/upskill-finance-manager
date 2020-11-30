@@ -6,6 +6,4 @@ public class PersonalFinanceManager {
 	// TODO
     Menu menu = new Menu();
 
-
-
 }
