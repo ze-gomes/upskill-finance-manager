@@ -56,7 +56,7 @@ public class Category implements Serializable {
             out.writeObject(categories);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data is saved in /categories");
+            System.out.printf("Serialized data was saved in /categories");
         } catch (IOException i) {
             i.printStackTrace();
         }

@@ -203,7 +203,6 @@ public abstract class Account {
     }
 
     public void autoCategorizeStatements(List<Category> categories) {
-        System.out.println(statements.toString());
         for (StatementLine statement : statements) {
             for (Category cat: categories) {
                 if ( cat.hasTag(statement.getDescription())){
@@ -223,17 +222,6 @@ public abstract class Account {
         }
     }
 
-
-
-    public static void main(String[] args) {
-        try {
-            File f = new File("src/pt/upskill/projeto2/financemanager/account_info_test/1234567890989.csv");
-            System.out.println(f.exists());
-            Account acc = Account.newAccount(f);
-            System.out.println(acc.statements.size());
-        } catch (Exception e){
-        }
-    }
 }
 
 
