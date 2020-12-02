@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 
-public class StatementLine {
+public class StatementLine implements Comparable {
     Date date;
     Date valueDate;
     String description;
@@ -95,5 +95,10 @@ public class StatementLine {
                 ", availableBalance=" + availableBalance +
                 ", category=" + category +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }

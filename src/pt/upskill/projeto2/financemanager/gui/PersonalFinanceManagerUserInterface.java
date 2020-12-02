@@ -33,6 +33,11 @@ public class PersonalFinanceManagerUserInterface {
     private PersonalFinanceManager personalFinanceManager;
 
     public void execute() {
+        Menu menu = new Menu();
+        switch (menu.requestSelection("Escolha uma opção", OPTIONS)){
+            case (OPT_GLOBAL_POSITION):
+                menu.requestInput("Introduza o numero da conta");
+        }
     }
 
 
