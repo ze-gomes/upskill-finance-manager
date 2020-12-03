@@ -6,9 +6,10 @@ import pt.upskill.projeto2.financemanager.date.Date;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 
-public class StatementLine implements Comparable {
+public class StatementLine implements Comparable<StatementLine> {
     Date date;
     Date valueDate;
     String description;
@@ -21,6 +22,7 @@ public class StatementLine implements Comparable {
 
     public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) throws IllegalArgumentException {
         if (date == null || valueDate == null || description == null || description.equals("") || credit < 0.0 || draft > 0.0){
+            System.out.println("Argumento ilegal");
             throw new IllegalArgumentException();
         }
         this.date = date;
@@ -34,18 +36,43 @@ public class StatementLine implements Comparable {
     }
 
 
-    public static StatementLine newStatementLine(String line) throws FileNotFoundException, NumberFormatException, ParseException, IllegalArgumentException {
+    public static StatementLine newStatementLine(String line) throws ParseException {
         String[] lineFormatted = line.split(";");
         // Date formatter
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date date = new Date(format.parse(lineFormatted[0]));
         Date valueDate = new Date(format.parse(lineFormatted[1]));
         String description = lineFormatted[2].trim();
-        double draft = Double.parseDouble(lineFormatted[3]);
-        double credit = Double.parseDouble(lineFormatted[4]);
+        // Tests if value is valid double and convert otherwise
+        double draft = convertToDouble(lineFormatted[3]);
+        double credit = convertToDouble(lineFormatted[4]);
         double accountingBalance = Double.parseDouble(lineFormatted[5]);
         double availableBalance = Double.parseDouble(lineFormatted[6]);
         return new StatementLine(date, valueDate, description, draft, credit, accountingBalance, availableBalance, null);
+    }
+
+    public static double convertToDouble(String s){
+        // First case, if value is not provided
+        if (s == null || s.equals("")){
+            return 0.0;
+            // if statement value is double format
+        } else if (isDouble(s)){
+            return Double.parseDouble(s);
+            // if string is int Format
+        } else {
+            return Double.valueOf(s);
+        }
+    }
+
+
+    // Test if value is double or not
+    public static boolean isDouble(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public Date getDate() {
@@ -97,8 +124,31 @@ public class StatementLine implements Comparable {
                 '}';
     }
 
+
+    // Compara statements por data
     @Override
-    public int compareTo(Object o) {
-        return 0;
+    public int compareTo(StatementLine s) {
+        return getDate().compareTo(s.getDate());
+    }
+
+
+    // Verifica se 2 statements sao iguais
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StatementLine)) return false;
+        StatementLine that = (StatementLine) o;
+        return Double.compare(that.getDraft(), getDraft()) == 0 &&
+                Double.compare(that.getCredit(), getCredit()) == 0 &&
+                Double.compare(that.getAccountingBalance(), getAccountingBalance()) == 0 &&
+                Double.compare(that.getAvailableBalance(), getAvailableBalance()) == 0 &&
+                getDate().equals(that.getDate()) &&
+                getValueDate().equals(that.getValueDate()) &&
+                getDescription().equals(that.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getDate(), getValueDate(), getDescription(), getDraft(), getCredit(), getAccountingBalance(), getAvailableBalance());
     }
 }

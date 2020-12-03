@@ -12,22 +12,43 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
 
 
 public class PersonalFinanceManager {
-    private ArrayList<Account> listaContas = new ArrayList<>();
+    private ArrayList<Account> listaContas;
 
+    public PersonalFinanceManager() {
+        listaContas = new ArrayList<Account>();
+        try {
+            criarContasFicheiros();
+            lerFicheirosStatements();
+        } catch (Exception e) {
+
+        }
+    }
+
+    // Creates all accounts from the .csv files in /account_info_test
     public void criarContasFicheiros() throws FileNotFoundException, BadFormatException, ParseException, UnknownAccountException {
-        File[] listFiles = new File("src/pt/upskill/projeto2/financemanager/account_info_test/").listFiles();
+        // Obtem lista de ficheiros de contas mas filtra antes para só carregar os .csv
+        File[] listFiles = new File("src/pt/upskill/projeto2/financemanager/account_info_test/").listFiles((d, name) -> name.endsWith(".csv"));
         for (File f : listFiles) {
             listaContas.add(Account.newAccount(f));
         }
     }
 
-    // Check if there is account with accID already added to the list
+    public void lerFicheirosStatements() throws FileNotFoundException, ParseException {
+        // Obtem lista de ficheiros de contas mas filtra antes para só carregar os .csv
+        File[] listFiles = new File("statements/").listFiles();
+        for (File statementf : listFiles) {
+            addfromStatements(statementf);
+        }
+    }
+
+    // Check if there is account with accID already added to the list, returns that Account if true
     public Account checkIfExistingAccID(long accId) {
         for (Account a : listaContas) {
             if (a.getId() == accId) {
@@ -37,9 +58,13 @@ public class PersonalFinanceManager {
         return null;
     }
 
-    public Account addfromStatements(File f) throws FileNotFoundException, BadFormatException, ParseException, UnknownAccountException {
+    public ArrayList<Account> getListaContas() {
+        return listaContas;
+    }
+
+    // Check statements .csv files and add new accounts if necessary, or add statements to already existing accounts
+    public Account addfromStatements(File f) throws FileNotFoundException, ParseException {
         // Date formatter
-        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         boolean statementLines = false;
         // Variables to store info
         long id = 0;
@@ -55,35 +80,55 @@ public class PersonalFinanceManager {
             // Account general info
             if (identifierWord.equals("Account")) {
                 id = Long.parseLong(lineFormatted[1]);
-                moeda = Currency.valueOf(lineFormatted[2]);
+                System.out.println("COnta lida id = " + id);
                 name = lineFormatted[3];
                 accType = lineFormatted[4];
                 // If account number in statement doesn't exist, create new
-                if (checkIfExistingAccID(id) == null) {
-                    if (accType.equals("DraftAccount"))
+                account = checkIfExistingAccID(id);
+                if (account == null) {
+                    System.out.println("COnta null");
+                    if (accType.equals("DraftAccount")) {
                         account = new DraftAccount(id, name, moeda);
-                    else if (accType.equals("SavingsAccount"))
+                        listaContas.add(account);
+                    } else if (accType.equals("SavingsAccount")) {
                         account = new SavingsAccount(id, name, moeda);
-                } else { // Otherwise edit existing acc
-                    account = checkIfExistingAccID(id);
+                        listaContas.add(account);
+                    }
                 }
-                // Account Dates
-            } else if (identifierWord.equals("StartingDate")) {
-                account.setStartDate(new Date(format.parse(lineFormatted[1])));
-            } else if (identifierWord.equals("EndingDate")) {
-                account.setEndDate(new Date(format.parse(lineFormatted[1])));
+                // Start of statements line
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
-            } else if (statementLines) {
+            } else if (statementLines && line.charAt(0) != ' ') {
                 StatementLine statement = newStatementLine(line);
-                account.addStatementLine(statement);
+                // if statement doesn't exist in account, add it, otherwise do nothing
+                if (!account.checkIfStatementAlreadyExists(statement)) {
+                    account.addStatementLine(statement);
+                }
             }
         }
+        s.close();
+        account.sortStatementLines();
         return account;
     }
 
     public void execute() {
 
+    }
+
+    public double saldoTotalContas() {
+        double saldoTotal = 0.0;
+        for (Account a : listaContas) {
+            saldoTotal += a.currentBalance();
+        }
+        return saldoTotal;
+    }
+
+    public void imprimirSaldoContas() {
+        for (Account a : listaContas) {
+            System.out.println("-------------------------------------------");
+            System.out.println(a.getId() + " - " + a.currentBalance());
+            a.printAllStatements();
+        }
     }
 
 

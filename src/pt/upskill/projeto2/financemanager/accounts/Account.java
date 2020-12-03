@@ -1,5 +1,7 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
+import pt.upskill.projeto2.financemanager.accounts.formats.LongStatementFormat;
+import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
 import pt.upskill.projeto2.financemanager.exceptions.BadFormatException;
@@ -9,10 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Scanner;
+import java.util.*;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
 import static pt.upskill.projeto2.financemanager.date.Date.intToMonth;
@@ -219,6 +218,28 @@ public abstract class Account {
             if(statementsIterator.next().getDate().compareTo(date) < 0){
                 statementsIterator.remove();
             }
+        }
+    }
+
+    public void sortStatementLines(){
+        Collections.sort(statements);
+    }
+
+    public boolean checkIfStatementAlreadyExists(StatementLine toBeChecked){
+        for (StatementLine s: statements) {
+             if (s.equals(toBeChecked)){
+                 return true;
+             }
+        }
+        // No equal statement found already in account
+        return false;
+    }
+
+    // Prints all statements in the console using SimpleStatementFormat
+    public void printAllStatements(){
+        LongStatementFormat statementFormat = new LongStatementFormat();
+        for (StatementLine s: statements) {
+            System.out.println(statementFormat.format(s));
         }
     }
 

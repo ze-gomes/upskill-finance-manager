@@ -1,6 +1,7 @@
 package pt.upskill.projeto2.financemanager.gui;
 
 import pt.upskill.projeto2.financemanager.PersonalFinanceManager;
+import pt.upskill.projeto2.financemanager.accounts.Account;
 import pt.upskill.projeto2.utils.Menu;
 
 /**
@@ -11,9 +12,10 @@ import pt.upskill.projeto2.utils.Menu;
 
 public class PersonalFinanceManagerUserInterface {
 
-    public PersonalFinanceManagerUserInterface(
-            PersonalFinanceManager personalFinanceManager) {
+    public PersonalFinanceManagerUserInterface(PersonalFinanceManager personalFinanceManager) {
         this.personalFinanceManager = personalFinanceManager;
+        this.menu = new Menu();
+
     }
 
     private static final String OPT_GLOBAL_POSITION = "Posição Global";
@@ -30,13 +32,33 @@ public class PersonalFinanceManagerUserInterface {
     private static final String[] OPTIONS = {OPT_GLOBAL_POSITION,
             OPT_ACCOUNT_STATEMENT, OPT_LIST_CATEGORIES, OPT_ANALISE, OPT_EXIT};
 
+    private static final String SEPARATOR = "-----------------------------------------------------------";
+
     private PersonalFinanceManager personalFinanceManager;
+    private Menu menu;
+
 
     public void execute() {
-        Menu menu = new Menu();
-        switch (menu.requestSelection("Escolha uma opção", OPTIONS)){
+        String option = menu.requestSelection("Escolha uma opção", OPTIONS);
+        if (option!=null){
+            optionSelected(option);
+        }
+    }
+
+
+    public void optionSelected(String option) {
+        switch (option) {
             case (OPT_GLOBAL_POSITION):
-                menu.requestInput("Introduza o numero da conta");
+                System.out.println("Posicao Global:");
+                System.out.println("Numero de Conta - Saldo");
+                personalFinanceManager.imprimirSaldoContas();
+                System.out.println("Saldo Total: " + personalFinanceManager.saldoTotalContas());
+                execute();
+            case (OPT_ACCOUNT_STATEMENT):
+            case (OPT_EXIT):
+                System.out.println(SEPARATOR);
+                System.out.println("A terminar sessão");
+                break;
         }
     }
 
