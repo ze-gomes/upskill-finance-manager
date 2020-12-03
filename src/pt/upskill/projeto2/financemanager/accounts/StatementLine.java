@@ -3,7 +3,6 @@ package pt.upskill.projeto2.financemanager.accounts;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
 
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -22,7 +21,6 @@ public class StatementLine implements Comparable<StatementLine> {
 
     public StatementLine(Date date, Date valueDate, String description, double draft, double credit, double accountingBalance, double availableBalance, Category category) throws IllegalArgumentException {
         if (date == null || valueDate == null || description == null || description.equals("") || credit < 0.0 || draft > 0.0){
-            System.out.println("Argumento ilegal");
             throw new IllegalArgumentException();
         }
         this.date = date;

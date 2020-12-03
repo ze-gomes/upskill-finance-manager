@@ -46,6 +46,6 @@ public class FileAccountFormat implements Format {
         }
         String nl = System.getProperty("line.separator");
         return "Account Info - " + new Date().toString() + nl
-                + "Account  ;" + acc.getId() +" ; " + acc.getMoeda() + "  ;" + acc.getName() + " ;" + accType + " ;" + nl;
+                + "Account  ;" + acc.getId() +" ; " + acc.getMoeda() + "  ;" + acc.getName() + " ;" + accType + " ;";
     }
 }

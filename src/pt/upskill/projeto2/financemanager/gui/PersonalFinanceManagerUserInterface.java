@@ -11,20 +11,21 @@ import pt.upskill.projeto2.utils.Menu;
 
 public class PersonalFinanceManagerUserInterface {
 
+    public static final String SEPARATOR = "-----------------------------------------------------------";
     private static final String OPT_GLOBAL_POSITION = "Posição Global";
     private static final String OPT_ACCOUNT_STATEMENT = "Movimentos Conta";
     private static final String OPT_LIST_CATEGORIES = "Listar categorias";
     private static final String OPT_ANALISE = "Análise";
     private static final String OPT_EXIT = "Sair";
-    private static final String OPT_MONTHLY_SUMMARY = "Evoluçãoo global por mês";
+    private static final String OPT_MONTHLY_SUMMARY = "Evolução global por mês";
     private static final String OPT_PREDICTION_PER_CATEGORY = "Previsão gastos totais do mês por categoria";
     private static final String OPT_ANUAL_INTEREST = "Previsão juros anuais";
     private static final String[] OPTIONS_ANALYSIS = {OPT_MONTHLY_SUMMARY, OPT_PREDICTION_PER_CATEGORY, OPT_ANUAL_INTEREST};
     private static final String[] OPTIONS = {OPT_GLOBAL_POSITION,
             OPT_ACCOUNT_STATEMENT, OPT_LIST_CATEGORIES, OPT_ANALISE, OPT_EXIT};
-    public static final String SEPARATOR = "-----------------------------------------------------------";
     private PersonalFinanceManager personalFinanceManager;
     private Menu mainMenu;
+
     public PersonalFinanceManagerUserInterface(PersonalFinanceManager personalFinanceManager) {
         this.personalFinanceManager = personalFinanceManager;
         this.mainMenu = new Menu();
@@ -45,17 +46,30 @@ public class PersonalFinanceManagerUserInterface {
                 System.out.println(SEPARATOR);
                 personalFinanceManager.posicaoGlobal();
                 execute();
+                break;
             case (OPT_ACCOUNT_STATEMENT):
-                System.out.println(SEPARATOR);
                 String accId = mainMenu.requestSelection("Escolha uma conta para consultar os extractos", personalFinanceManager.getArrayIds());
                 if (accId != null) {
                     long accIdSelected = Long.parseLong(accId);
+                    System.out.println(SEPARATOR);
                     personalFinanceManager.printAccountStatements(personalFinanceManager.checkIfExistingAccID(accIdSelected));
                 }
                 execute();
-            case (OPT_EXIT):
+                break;
+            case (OPT_LIST_CATEGORIES):
                 System.out.println(SEPARATOR);
-                System.out.println("A terminar sessão");
+                personalFinanceManager.printAllCategories();
+                execute();
+                break;
+            case (OPT_ANALISE):
+                System.out.println(SEPARATOR);
+                String selection = mainMenu.requestSelection("Escolha uma das seguintes opções de análise:", OPTIONS_ANALYSIS);
+                if (selection != null) {
+                }
+                execute();
+                break;
+            case (OPT_EXIT):
+                System.out.println("A terminar sessão...");
                 break;
         }
     }

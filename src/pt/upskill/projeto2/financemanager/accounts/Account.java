@@ -26,7 +26,6 @@ public abstract class Account {
     private ArrayList<StatementLine> statements = new ArrayList<StatementLine>();
     private BanksConstants banksConstants = new BanksConstants();
 
-
     public Account(long id, String name) {
         this.id = id;
         this.name = name;

@@ -2,6 +2,7 @@ package pt.upskill.projeto2.financemanager;
 
 import pt.upskill.projeto2.financemanager.accounts.*;
 import pt.upskill.projeto2.financemanager.accounts.formats.FileAccountFormat;
+import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.exceptions.BadFormatException;
 import pt.upskill.projeto2.financemanager.exceptions.UnknownAccountException;
 import pt.upskill.projeto2.financemanager.filters.AccountIdSelector;
@@ -19,11 +20,14 @@ import static pt.upskill.projeto2.financemanager.gui.PersonalFinanceManagerUserI
 
 public class PersonalFinanceManager {
     private List<Account> listaContas = new ArrayList<Account>();
+    private List<Category> listCategories = new ArrayList<Category>();
+
 
     public PersonalFinanceManager() {
         try {
             criarContasFicheiros();
             lerFicheirosStatements();
+            listCategories = Category.readCategories(new File("account_info/categories"));
         } catch (Exception e) {
 
         }
@@ -34,7 +38,7 @@ public class PersonalFinanceManager {
         // Obtem lista de ficheiros de contas mas filtra antes para só carregar os .csv
         File[] listFiles = new File("account_info/").listFiles((d, name) -> name.endsWith(".csv"));
         for (File f : listFiles) {
-            listaContas.add(Account.newAccount(f));
+            addAccount(Account.newAccount(f));
         }
     }
 
@@ -45,6 +49,15 @@ public class PersonalFinanceManager {
         for (File statementf : listFiles) {
             addfromStatements(statementf);
         }
+    }
+
+
+    // Add accoun to list but first autocategorize Statements
+    // and sort statements to guaratee everything is displayed correctly
+    public void addAccount(Account a){
+        a.sortStatementLines();
+        a.autoCategorizeStatements(listCategories);
+        listaContas.add(a);
     }
 
     // Check if there is account with accID already added to the list, returns that Account if true
@@ -96,10 +109,10 @@ public class PersonalFinanceManager {
                 if (account == null) {
                     if (accType.equals("DraftAccount")) {
                         account = new DraftAccount(id, name, moeda);
-                        listaContas.add(account);
+                        addAccount(account);
                     } else if (accType.equals("SavingsAccount")) {
                         account = new SavingsAccount(id, name, moeda);
-                        listaContas.add(account);
+                        addAccount(account);
                     }
                 }
                 // Start of statements line
@@ -114,7 +127,6 @@ public class PersonalFinanceManager {
             }
         }
         s.close();
-        account.sortStatementLines();
     }
 
 
@@ -140,7 +152,16 @@ public class PersonalFinanceManager {
     public void printAccountStatements(Account a) {
         FileAccountFormat accFormat = new FileAccountFormat();
         System.out.println(accFormat.accountHeader(a));
+        System.out.println(SEPARATOR);
         a.printAllStatements();
+    }
+
+    public void printAllCategories(){
+        System.out.println("Lista de Todas as Categorias:");
+        System.out.println(SEPARATOR);
+        for (Category c: listCategories) {
+            System.out.println(c.toString());
+        }
     }
 }
 
