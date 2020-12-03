@@ -5,4 +5,7 @@ Starting date ;04-01-2014
 Ending Date ;16-01-2014
 
 Date ;Value Date ;Description ;Draft ;Credit ;Accounting balance ;Available balance 
-02-01-2014;02-01-2014;TRANSF ;;300;4100.00;4100.00
+02-01-2014 ;02-01-2014 ;TRANSF ;0.0 ;300.0 ;3300.0 ;3300.0
+02-01-2014 ;02-01-2014 ;TRANSF ;0.0 ;300.0 ;3600.0 ;3600.0
+03-01-2014 ;03-01-2014 ;TRANSF ;0.0 ;300.0 ;3900.0 ;3900.0
+03-01-2014 ;03-01-2014 ;TRANSF ;0.0 ;200.0 ;4100.0 ;4100.0

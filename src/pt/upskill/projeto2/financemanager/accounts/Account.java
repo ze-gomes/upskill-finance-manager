@@ -1,6 +1,5 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
-import pt.upskill.projeto2.financemanager.accounts.formats.LongStatementFormat;
 import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
@@ -79,7 +78,7 @@ public abstract class Account {
                 account.endDate = new Date(format.parse(lineFormatted[1]));
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
-            } else if (statementLines) {
+            } else if (statementLines && !line.equals("")) {
                 StatementLine statement = newStatementLine(line);
                 account.addStatementLine(statement);
             }
@@ -225,6 +224,8 @@ public abstract class Account {
         Collections.sort(statements);
     }
 
+
+    // Check if a certain statement is already saved on the account
     public boolean checkIfStatementAlreadyExists(StatementLine toBeChecked){
         for (StatementLine s: statements) {
              if (s.equals(toBeChecked)){
@@ -237,7 +238,7 @@ public abstract class Account {
 
     // Prints all statements in the console using SimpleStatementFormat
     public void printAllStatements(){
-        LongStatementFormat statementFormat = new LongStatementFormat();
+        SimpleStatementFormat statementFormat = new SimpleStatementFormat();
         for (StatementLine s: statements) {
             System.out.println(statementFormat.format(s));
         }
