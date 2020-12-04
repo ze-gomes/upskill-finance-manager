@@ -1,7 +1,12 @@
 package pt.upskill.projeto2.financemanager.gui;
 
 import pt.upskill.projeto2.financemanager.PersonalFinanceManager;
+import pt.upskill.projeto2.financemanager.accounts.StatementLine;
+import pt.upskill.projeto2.financemanager.accounts.formats.LongStatementFormat;
+import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementCatFormat;
 import pt.upskill.projeto2.utils.Menu;
+
+import java.util.ArrayList;
 
 /**
  * @author upSkill 2020
@@ -33,6 +38,16 @@ public class PersonalFinanceManagerUserInterface {
     }
 
     public void execute() {
+        ArrayList<StatementLine> statementsNoCat = personalFinanceManager.getAllNullCategoryStatements();
+        System.out.println(statementsNoCat.toString());
+        if (statementsNoCat != null) {
+            for (StatementLine s: statementsNoCat) {
+                SimpleStatementCatFormat statementCatFormat = new SimpleStatementCatFormat();
+                String sFormat = statementCatFormat.format(s);
+                String optionCategory = mainMenu.requestSelection("O statement " + sFormat + " Não tem categoria actualmente, por favor atribua uma categoria a este", personalFinanceManager.getArrayCategories());
+                s.setCategory(personalFinanceManager.getCategoryByName(optionCategory));
+            }
+        }
         String option = mainMenu.requestSelection("Escolha uma opção", OPTIONS);
         if (option != null) {
             optionSelected(option);

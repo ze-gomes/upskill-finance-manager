@@ -1,5 +1,6 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
+import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementCatFormat;
 import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
@@ -201,12 +202,24 @@ public abstract class Account {
 
     public void autoCategorizeStatements(List<Category> categories) {
         for (StatementLine statement : statements) {
-            for (Category cat: categories) {
-                if ( cat.hasTag(statement.getDescription())){
-                    statement.setCategory(cat);
+            // Only categorize statements with null categories (uncategorized)
+            if (statement.getCategory() == null){
+                for (Category cat: categories) {
+                    if ( cat.hasTag(statement.getDescription())){
+                        statement.setCategory(cat);
+                    }
                 }
             }
         }
+    }
+
+    public boolean hasUncategorizedStatement(){
+        for (StatementLine statement : statements) {
+            if (statement.getCategory() == null){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void removeStatementLinesBefore(Date date) {
@@ -237,7 +250,7 @@ public abstract class Account {
 
     // Prints all statements in the console using SimpleStatementFormat
     public void printAllStatements(){
-        SimpleStatementFormat statementFormat = new SimpleStatementFormat();
+        SimpleStatementCatFormat statementFormat = new SimpleStatementCatFormat();
         for (StatementLine s: statements) {
             System.out.println(statementFormat.format(s));
         }

@@ -14,20 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static pt.upskill.projeto2.financemanager.accounts.SavingsAccount.savingsCategory;
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
 import static pt.upskill.projeto2.financemanager.gui.PersonalFinanceManagerUserInterface.SEPARATOR;
 
 
 public class PersonalFinanceManager {
     private List<Account> listaContas = new ArrayList<Account>();
-    private List<Category> listCategories = new ArrayList<Category>();
+    private List<Category> listCategories;
 
 
     public PersonalFinanceManager() {
         try {
+            listCategories = Category.readCategories(new File("account_info/categories"));
             criarContasFicheiros();
             lerFicheirosStatements();
-            listCategories = Category.readCategories(new File("account_info/categories"));
+            printAllCategories();
         } catch (Exception e) {
 
         }
@@ -50,6 +52,32 @@ public class PersonalFinanceManager {
             addfromStatements(statementf);
         }
     }
+
+//    public void createCategories(){
+//        List<Category> listCategories = new ArrayList<Category>();
+//        Category cat1 = new Category("HOME");
+//        Category cat2 = new Category("CAR");
+//        Category cat3 = new Category("FOOD");
+//        Category cat4 = new Category("EXTRAS");
+//        Category cat5 = savingsCategory;
+//        cat1.addTag("PURCHASE");
+//        cat1.addTag("TRANSF");
+//        cat2.addTag("GASOLINA");
+//        cat2.addTag("SUMMARY");
+//        cat3.addTag("LOW VALUE");
+//        listCategories.add(cat1);
+//        listCategories.add(cat2);
+//        listCategories.add(cat3);
+//        listCategories.add(cat4);
+//        listCategories.add(cat5);
+//        try {
+//            File f = new File("account_info/categories");
+//            Category.writeCategories(f, listCategories);
+//        } catch (Exception e) {
+//
+//        }
+//
+//    }
 
 
     // Add accoun to list but first autocategorize Statements
@@ -87,6 +115,20 @@ public class PersonalFinanceManager {
             arrCats[i] = "" + listCategories.get(i).getName();
         }
         return arrCats;
+    }
+
+    public ArrayList<StatementLine> getAllNullCategoryStatements(){
+        ArrayList<StatementLine> allNullCatStatements = new ArrayList<>();
+        for (Account a: listaContas) {
+            if (a.hasUncategorizedStatement()) {
+                for (StatementLine s: a.getStatements()) {
+                    if (s.getCategory() == null){
+                       allNullCatStatements.add(s);
+                    }
+                }
+            }
+        }
+        return allNullCatStatements;
     }
 
 
@@ -173,6 +215,15 @@ public class PersonalFinanceManager {
         for (Category c: listCategories) {
             System.out.println(c.toString());
         }
+    }
+
+    public Category getCategoryByName(String name){
+        for (Category c: listCategories) {
+            if (name.equals(c.getName())){
+                return c;
+            }
+        }
+        return null;
     }
 
     public void printCategoryTags(String name){
