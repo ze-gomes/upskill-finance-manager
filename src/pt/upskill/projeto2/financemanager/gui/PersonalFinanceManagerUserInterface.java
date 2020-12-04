@@ -58,7 +58,8 @@ public class PersonalFinanceManagerUserInterface {
                 break;
             case (OPT_LIST_CATEGORIES):
                 System.out.println(SEPARATOR);
-                personalFinanceManager.printAllCategories();
+                String cat = mainMenu.requestSelection("Selecione a categoria que quer consultar", personalFinanceManager.getArrayCategories());
+                personalFinanceManager.printCategoryTags(cat);
                 execute();
                 break;
             case (OPT_ANALISE):

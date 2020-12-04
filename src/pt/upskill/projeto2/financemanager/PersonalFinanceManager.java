@@ -80,6 +80,17 @@ public class PersonalFinanceManager {
         return arrIds;
     }
 
+    // Gets a array of categories in String format as used by the menu
+    public String[] getArrayCategories() {
+        String[] arrCats = new String[listCategories.size()];
+        for (int i = 0; i < listCategories.size(); i++) {
+            arrCats[i] = "" + listCategories.get(i).getName();
+        }
+        return arrCats;
+    }
+
+
+
     public List<Account> getListaContas() {
         return listaContas;
     }
@@ -162,6 +173,17 @@ public class PersonalFinanceManager {
         for (Category c: listCategories) {
             System.out.println(c.toString());
         }
+    }
+
+    public void printCategoryTags(String name){
+        Category cat = null;
+        for (Category c: listCategories) {
+            if (name.equals(c.getName())){
+                cat = c;
+            }
+        }
+        System.out.println("Category:");
+        System.out.println(cat.toString());
     }
 }
 
