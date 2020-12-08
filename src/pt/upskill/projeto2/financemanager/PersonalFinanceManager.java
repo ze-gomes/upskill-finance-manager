@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import static pt.upskill.projeto2.financemanager.accounts.SavingsAccount.savingsCategory;
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
 import static pt.upskill.projeto2.financemanager.gui.PersonalFinanceManagerUserInterface.SEPARATOR;
 
@@ -29,7 +28,6 @@ public class PersonalFinanceManager {
             listCategories = Category.readCategories(new File("account_info/categories"));
             criarContasFicheiros();
             lerFicheirosStatements();
-            printAllCategories();
         } catch (Exception e) {
 
         }
@@ -80,7 +78,7 @@ public class PersonalFinanceManager {
 //    }
 
 
-    // Add accoun to list but first autocategorize Statements
+    // Add account to list but first autocategorize Statements
     // and sort statements to guaratee everything is displayed correctly
     public void addAccount(Account a){
         a.sortStatementLines();
