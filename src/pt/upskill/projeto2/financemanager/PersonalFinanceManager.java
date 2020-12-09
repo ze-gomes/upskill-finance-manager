@@ -1,18 +1,19 @@
 package pt.upskill.projeto2.financemanager;
 
+import pt.upskill.projeto2.financemanager.accounts.Currency;
 import pt.upskill.projeto2.financemanager.accounts.*;
 import pt.upskill.projeto2.financemanager.accounts.formats.FileAccountFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
+import pt.upskill.projeto2.financemanager.date.Date;
 import pt.upskill.projeto2.financemanager.exceptions.BadFormatException;
 import pt.upskill.projeto2.financemanager.exceptions.UnknownAccountException;
 import pt.upskill.projeto2.financemanager.filters.AccountIdSelector;
+import pt.upskill.projeto2.financemanager.filters.NoCategorySelector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
 import static pt.upskill.projeto2.financemanager.gui.PersonalFinanceManagerUserInterface.SEPARATOR;
@@ -25,9 +26,12 @@ public class PersonalFinanceManager {
 
     public PersonalFinanceManager() {
         try {
+            // When initialized, must immediatly read all categories first, create accounts from accounts and statements folders respectively
             listCategories = Category.readCategories(new File("account_info/categories"));
             criarContasFicheiros();
             lerFicheirosStatements();
+            getEarliestStartDate();
+            getLatestEndDate();
         } catch (Exception e) {
 
         }
@@ -51,6 +55,7 @@ public class PersonalFinanceManager {
         }
     }
 
+    // Test to create categories
 //    public void createCategories(){
 //        List<Category> listCategories = new ArrayList<Category>();
 //        Category cat1 = new Category("HOME");
@@ -80,7 +85,7 @@ public class PersonalFinanceManager {
 
     // Add account to list but first autocategorize Statements
     // and sort statements to guaratee everything is displayed correctly
-    public void addAccount(Account a){
+    public void addAccount(Account a) {
         a.sortStatementLines();
         a.autoCategorizeStatements(listCategories);
         listaContas.add(a);
@@ -115,20 +120,21 @@ public class PersonalFinanceManager {
         return arrCats;
     }
 
-    public ArrayList<StatementLine> getAllNullCategoryStatements(){
+    // Gets a  List of all Statements that have no category attributed
+    public ArrayList<StatementLine> getAllNullCategoryStatements() {
+        NoCategorySelector selector = new NoCategorySelector();
         ArrayList<StatementLine> allNullCatStatements = new ArrayList<>();
-        for (Account a: listaContas) {
+        for (Account a : listaContas) {
             if (a.hasUncategorizedStatement()) {
-                for (StatementLine s: a.getStatements()) {
-                    if (s.getCategory() == null){
-                       allNullCatStatements.add(s);
+                for (StatementLine s : a.getStatements()) {
+                    if (selector.isSelected(s)) {
+                        allNullCatStatements.add(s);
                     }
                 }
             }
         }
         return allNullCatStatements;
     }
-
 
 
     public List<Account> getListaContas() {
@@ -181,6 +187,7 @@ public class PersonalFinanceManager {
     }
 
 
+    // Print total balance for all accounts
     public double saldoTotalContas() {
         double saldoTotal = 0.0;
         for (Account a : listaContas) {
@@ -189,17 +196,33 @@ public class PersonalFinanceManager {
         return saldoTotal;
     }
 
-    public void posicaoGlobal(){
+    // Prints global position for all accounts
+    public void posicaoGlobal() {
         System.out.println("Posicao Global:");
         System.out.println(SEPARATOR);
         System.out.println("Numero de Conta - Saldo");
-        for (Account a: listaContas) {
+        for (Account a : listaContas) {
             System.out.println(a.getId() + " - " + a.currentBalance());
         }
         System.out.println(SEPARATOR);
         System.out.println("Saldo Total: " + saldoTotalContas());
     }
 
+    public void monthlyGlobalEvolution() {
+        Date dateIterator = getEarliestStartDate();
+        Date latest = getLatestEndDate();
+        while (dateIterator.before(latest)){
+            double TotalForMonth = 0;
+            for (Account a : listaContas) {
+                TotalForMonth = a.totalForMonth(dateIterator.getMonth().getValue(), dateIterator.getYear());
+                dateIterator = Date.firstOfNextMonth(dateIterator);
+            }
+            System.out.println("Total for month of " + dateIterator.getMonth().name() + " " + dateIterator.getYear() + ": " + TotalForMonth);
+        }
+
+    }
+
+    // Prints account statements to console
     public void printAccountStatements(Account a) {
         FileAccountFormat accFormat = new FileAccountFormat();
         System.out.println(accFormat.accountHeader(a));
@@ -207,33 +230,56 @@ public class PersonalFinanceManager {
         a.printAllStatements();
     }
 
-    public void printAllCategories(){
+    // Prints all categories to console
+    public void printAllCategories() {
         System.out.println("Lista de Todas as Categorias:");
         System.out.println(SEPARATOR);
-        for (Category c: listCategories) {
+        for (Category c : listCategories) {
             System.out.println(c.toString());
         }
     }
 
-    public Category getCategoryByName(String name){
-        for (Category c: listCategories) {
-            if (name.equals(c.getName())){
+    // Gets category from the list by name
+    public Category getCategoryByName(String name) {
+        for (Category c : listCategories) {
+            if (name.equals(c.getName())) {
                 return c;
             }
         }
         return null;
     }
 
-    public void printCategoryTags(String name){
+    // Print category and its tags individually to console
+    public void printCategoryTags(String name) {
         Category cat = null;
-        for (Category c: listCategories) {
-            if (name.equals(c.getName())){
+        for (Category c : listCategories) {
+            if (name.equals(c.getName())) {
                 cat = c;
             }
         }
         System.out.println("Category:");
         System.out.println(cat.toString());
     }
+
+    // Get date intervals for monthly position
+    public Date getEarliestStartDate() {
+        ArrayList<Date> listStartDates = new ArrayList<>();
+        for (Account a : listaContas) {
+            listStartDates.add(a.getStartDate());
+        }
+        Collections.sort(listStartDates);
+        return listStartDates.get(0);
+    }
+
+    public Date getLatestEndDate() {
+        ArrayList<Date> listEndDates = new ArrayList<>();
+        for (Account a : listaContas) {
+            listEndDates.add(a.getEndDate());
+        }
+        Collections.sort(listEndDates);
+        return listEndDates.get(listEndDates.size()-1);
+    }
+
 }
 
 

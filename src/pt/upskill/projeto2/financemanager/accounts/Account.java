@@ -1,11 +1,11 @@
 package pt.upskill.projeto2.financemanager.accounts;
 
 import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementCatFormat;
-import pt.upskill.projeto2.financemanager.accounts.formats.SimpleStatementFormat;
 import pt.upskill.projeto2.financemanager.categories.Category;
 import pt.upskill.projeto2.financemanager.date.Date;
 import pt.upskill.projeto2.financemanager.exceptions.BadFormatException;
 import pt.upskill.projeto2.financemanager.exceptions.UnknownAccountException;
+import pt.upskill.projeto2.financemanager.filters.SameMonthSelector;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static pt.upskill.projeto2.financemanager.accounts.StatementLine.newStatementLine;
-import static pt.upskill.projeto2.financemanager.date.Date.intToMonth;
 
 public abstract class Account {
     private Currency moeda;
@@ -191,12 +190,16 @@ public abstract class Account {
     }
 
     public double totalForMonth(int month, int year) {
+        // Create new selector for month
+        SameMonthSelector selector = new SameMonthSelector(month,year);
         double totalMonth = 0.0;
         for (StatementLine statement: statements) {
-            if (statement.getDate().getYear() == year && statement.getDate().getMonth() ==  intToMonth(month)){
+            if (selector.isSelected(statement)) {
                 totalMonth += statement.getDraft();
+                //totalMonth += statement.getCredit();
             }
         }
+        System.out.println("Total for month " + month + " year: " + year + "=" + totalMonth);
         return totalMonth;
     }
 
@@ -226,7 +229,7 @@ public abstract class Account {
         // Need to use a iterator to remove from list concurrently
         ListIterator<StatementLine> statementsIterator = statements.listIterator();
         while(statementsIterator.hasNext()){
-            if(statementsIterator.next().getDate().compareTo(date) < 0){
+            if (statementsIterator.next().getDate().before(date)){
                 statementsIterator.remove();
             }
         }

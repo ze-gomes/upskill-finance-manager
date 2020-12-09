@@ -19,4 +19,11 @@ public class BeforeDateSelector  implements Selector<StatementLine>{
         }
         return false;
     }
+
+    public boolean isSelected(Date date) {
+        if (date.compareTo(this.date) < 0){
+            return true;
+        }
+        return false;
+    }
 }

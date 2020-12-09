@@ -53,7 +53,7 @@ public class PersonalFinanceManagerUserInterface {
                 execute();
                 break;
             case (OPT_ACCOUNT_STATEMENT):
-                String accId = mainMenu.requestSelection("Escolha uma conta para consultar os extractos", personalFinanceManager.getArrayIds());
+                String accId = mainMenu.requestSelection("Escolha uma conta para consultar", personalFinanceManager.getArrayIds());
                 if (accId != null) {
                     long accIdSelected = Long.parseLong(accId);
                     System.out.println(SEPARATOR);
@@ -88,11 +88,28 @@ public class PersonalFinanceManagerUserInterface {
                 System.out.println(SEPARATOR);
                 String selection = mainMenu.requestSelection("Escolha uma das seguintes opções de análise:", OPTIONS_ANALYSIS);
                 if (selection != null) {
+                    menuAnalise(selection);
                 }
                 execute();
                 break;
             case (OPT_EXIT):
                 System.out.println("A terminar sessão...");
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void menuAnalise(String option) {
+        switch (option) {
+            case (OPT_MONTHLY_SUMMARY):
+                personalFinanceManager.monthlyGlobalEvolution();
+                break;
+            case (OPT_PREDICTION_PER_CATEGORY):
+                break;
+            case (OPT_ANUAL_INTEREST):
+                break;
+            default:
                 break;
         }
     }

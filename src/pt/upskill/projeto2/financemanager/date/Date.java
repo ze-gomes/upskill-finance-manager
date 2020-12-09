@@ -1,9 +1,9 @@
 package pt.upskill.projeto2.financemanager.date;
 
+import pt.upskill.projeto2.financemanager.exceptions.BadDate;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import pt.upskill.projeto2.financemanager.exceptions.BadDate;
 
 /**
  * @author upSkill 2020
@@ -11,7 +11,7 @@ import pt.upskill.projeto2.financemanager.exceptions.BadDate;
  * ...
  */
 
-public class Date {
+public class Date implements Comparable<Date>{
 
     private java.util.Date date = Calendar.getInstance().getTime();
 
@@ -198,5 +198,5 @@ public class Date {
     public static Month intToMonth(int i) {
         return Month.values()[i];
     }
-
+    
 }
