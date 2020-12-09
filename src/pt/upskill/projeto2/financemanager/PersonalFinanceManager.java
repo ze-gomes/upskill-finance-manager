@@ -175,7 +175,7 @@ public class PersonalFinanceManager {
                 // Start of statements line
             } else if (identifierWord.equals("Date")) {
                 statementLines = true;
-            } else if (statementLines && line.charAt(0) != ' ') {
+            } else if (statementLines && !line.equals("")) {
                 StatementLine statement = newStatementLine(line);
                 // if statement doesn't exist in account, add it, otherwise do nothing
                 if (!account.checkIfStatementAlreadyExists(statement)) {
@@ -208,18 +208,27 @@ public class PersonalFinanceManager {
         System.out.println("Saldo Total: " + saldoTotalContas());
     }
 
+
+    // Monthly global evolution of spending/income for all accounts
     public void monthlyGlobalEvolution() {
         Date dateIterator = getEarliestStartDate();
         Date latest = getLatestEndDate();
-        while (dateIterator.before(latest)){
-            double TotalForMonth = 0;
-            for (Account a : listaContas) {
-                TotalForMonth = a.totalForMonth(dateIterator.getMonth().getValue(), dateIterator.getYear());
-                dateIterator = Date.firstOfNextMonth(dateIterator);
-            }
-            System.out.println("Total for month of " + dateIterator.getMonth().name() + " " + dateIterator.getYear() + ": " + TotalForMonth);
+        System.out.println("Evolução Global por Mês:");
+        System.out.println(SEPARATOR);
+        while (dateIterator.before(latest)) {
+            getGlobalMonthlyBalance(dateIterator.getMonth().getValue(), dateIterator.getYear());
+            dateIterator = Date.firstOfNextMonth(dateIterator);
         }
+    }
 
+
+    // Prints global balance for all accounts for a given year and month
+    public void getGlobalMonthlyBalance(int month, int year) {
+        double totalForMonth = 0.0;
+        for (Account a : listaContas) {
+            totalForMonth += a.totalForMonth(month, year) + a.totalCreditForMonth(month, year);
+        }
+        System.out.println("Total for month of " + Date.intToMonth(month).name() + " " + year + ": " + totalForMonth);
     }
 
     // Prints account statements to console
@@ -261,6 +270,18 @@ public class PersonalFinanceManager {
         System.out.println(cat.toString());
     }
 
+    public void categoryEstimationMonth(long accoundId, Category cat){
+        Date dataActual = new Date();
+        Date inicioMes = Date.firstOfMonth(dataActual);
+        Date fimMes = Date.endOfMonth(dataActual);
+        Account a = checkIfExistingAccID(accoundId);
+        double gastosConta = a.totalDraftsCurrentMonthSoFar(cat);
+        System.out.println("Gastos com a conta " + accoundId + " para a categoria " + cat.getName() + ":");
+        System.out.println("Gastos até ao dia actual: " + gastosConta);
+        double previsaoGastos = (gastosConta/dataActual.diffInDays(inicioMes)) * inicioMes.diffInDays(fimMes);
+        System.out.println("Previsão de gastos até ao final do mês: " + previsaoGastos);
+    }
+
     // Get date intervals for monthly position
     public Date getEarliestStartDate() {
         ArrayList<Date> listStartDates = new ArrayList<>();
@@ -277,8 +298,10 @@ public class PersonalFinanceManager {
             listEndDates.add(a.getEndDate());
         }
         Collections.sort(listEndDates);
-        return listEndDates.get(listEndDates.size()-1);
+        return listEndDates.get(listEndDates.size() - 1);
     }
+
+
 
 }
 

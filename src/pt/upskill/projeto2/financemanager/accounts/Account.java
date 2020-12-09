@@ -182,13 +182,21 @@ public abstract class Account {
             if (statement.getCategory() == null){
                 continue;
             }
-            if (statement.getDate().compareTo(date) > 0 && statement.getCategory().getName().equals(category.getName())){
+            if (statement.getDate().after(date) && statement.getCategory().getName().equals(category.getName())){
                 totalDrafts += statement.getDraft();
             }
         }
         return totalDrafts;
     }
 
+    public double totalDraftsCurrentMonthSoFar(Category cat){
+        Date dataActual = new Date();
+        Date dateSoFar = Date.lastDayOfPreviousMonth(dataActual);
+        return totalDraftsForCategorySince(cat, dateSoFar);
+    }
+
+
+    // Drafts only
     public double totalForMonth(int month, int year) {
         // Create new selector for month
         SameMonthSelector selector = new SameMonthSelector(month,year);
@@ -199,9 +207,22 @@ public abstract class Account {
                 //totalMonth += statement.getCredit();
             }
         }
-        System.out.println("Total for month " + month + " year: " + year + "=" + totalMonth);
         return totalMonth;
     }
+
+    // Credit only
+    public double totalCreditForMonth(int month, int year) {
+        // Create new selector for month
+        SameMonthSelector selector = new SameMonthSelector(month,year);
+        double totalMonth = 0.0;
+        for (StatementLine statement: statements) {
+            if (selector.isSelected(statement)) {
+                totalMonth += statement.getCredit();
+            }
+        }
+        return totalMonth;
+    }
+
 
     public void autoCategorizeStatements(List<Category> categories) {
         for (StatementLine statement : statements) {

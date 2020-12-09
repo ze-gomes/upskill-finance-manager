@@ -16,7 +16,7 @@ public class Main {
         PersonalFinanceManagerUserInterface gui = new PersonalFinanceManagerUserInterface(personalFinanceManager);
         gui.execute();
 
-        // TODO Global Evolution month - menu
+        // Global Evolution month - menu
         // TODO Expected cost by category - menu
         // TODO interest for the year - menu
         // TODO Use Selectors with filters

@@ -85,7 +85,6 @@ public class PersonalFinanceManagerUserInterface {
                 execute();
                 break;
             case (OPT_ANALISE):
-                System.out.println(SEPARATOR);
                 String selection = mainMenu.requestSelection("Escolha uma das seguintes opções de análise:", OPTIONS_ANALYSIS);
                 if (selection != null) {
                     menuAnalise(selection);
@@ -106,6 +105,12 @@ public class PersonalFinanceManagerUserInterface {
                 personalFinanceManager.monthlyGlobalEvolution();
                 break;
             case (OPT_PREDICTION_PER_CATEGORY):
+                String accId = mainMenu.requestSelection("Escolha uma conta para consultar", personalFinanceManager.getArrayIds());
+                if (accId != null) {
+                    long accIdSelected = Long.parseLong(accId);
+                    String optionCategory = mainMenu.requestSelection("Escolha a categoria para consultar", personalFinanceManager.getArrayCategories());
+                    personalFinanceManager.categoryEstimationMonth(accIdSelected, personalFinanceManager.getCategoryByName(optionCategory));
+                }
                 break;
             case (OPT_ANUAL_INTEREST):
                 break;
