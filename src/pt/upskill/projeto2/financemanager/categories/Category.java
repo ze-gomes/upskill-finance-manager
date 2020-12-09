@@ -35,9 +35,10 @@ public class Category implements Serializable {
             in.close();
             fileIn.close();
         } catch (IOException i) {
+            System.out.println("Class file not found when loading categories");
             i.printStackTrace();
         } catch (ClassNotFoundException c) {
-            System.out.println("Class not found");
+            System.out.println("Class not found when loading categories");
             c.printStackTrace();
         }
         return listaCat;
@@ -56,8 +57,8 @@ public class Category implements Serializable {
             out.writeObject(categories);
             out.close();
             fileOut.close();
-            System.out.printf("Serialized data was saved in /categories");
         } catch (IOException i) {
+            System.out.println("Failure saving Categories to file.");
             i.printStackTrace();
         }
     }

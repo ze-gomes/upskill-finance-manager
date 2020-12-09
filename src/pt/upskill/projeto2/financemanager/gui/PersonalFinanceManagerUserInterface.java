@@ -41,6 +41,8 @@ public class PersonalFinanceManagerUserInterface {
         String option = mainMenu.requestSelection("Escolha uma opção", OPTIONS);
         if (option != null) {
             optionSelected(option);
+        } else {
+            saveConfirmation();
         }
     }
 
@@ -66,12 +68,17 @@ public class PersonalFinanceManagerUserInterface {
                 ArrayList<StatementLine> statementsNoCat = personalFinanceManager.getAllNullCategoryStatements();
                 // Percorre a lista se esta nao for vazia e tiver elementos
                 if ((statementsNoCat != null) && !statementsNoCat.isEmpty()) {
-                    for (StatementLine s: statementsNoCat) {
+                    for (StatementLine s : statementsNoCat) {
                         // Pede para categorizar statements 1 a 1
                         SimpleStatementCatFormat statementCatFormat = new SimpleStatementCatFormat();
                         String sFormat = statementCatFormat.format(s);
                         String optionCategory = mainMenu.requestSelectionStatement("Existem statements sem categoria actualmente", "Movimento: " + sFormat + "\nPor favor atribua-lhe uma das categorias abaixo: ", personalFinanceManager.getArrayCategories());
-                        s.setCategory(personalFinanceManager.getCategoryByName(optionCategory));
+                        if (optionCategory != null) {
+                            s.setCategory(personalFinanceManager.getCategoryByName(optionCategory));
+                        } else {
+                            System.out.println(" O Movimento [" + sFormat + "] não foi categorizado porque cancelou a acção!");
+                        }
+
                     }
                 } else {
                     System.out.println("Nao existem actualmente movimentos sem categoria atribuida.");
@@ -81,7 +88,9 @@ public class PersonalFinanceManagerUserInterface {
             case (OPT_LIST_CATEGORIES):
                 System.out.println(SEPARATOR);
                 String cat = mainMenu.requestSelection("Selecione a categoria que quer consultar", personalFinanceManager.getArrayCategories());
-                personalFinanceManager.printCategoryTags(cat);
+                if (cat != null) {
+                    personalFinanceManager.printCategoryTags(cat);
+                }
                 execute();
                 break;
             case (OPT_ANALISE):
@@ -92,11 +101,22 @@ public class PersonalFinanceManagerUserInterface {
                 execute();
                 break;
             case (OPT_EXIT):
-                System.out.println("A terminar sessão...");
+                saveConfirmation();
                 break;
             default:
                 break;
         }
+    }
+
+    public void saveConfirmation(){
+        System.out.println(SEPARATOR);
+        Boolean save = mainMenu.yesOrNoInput("Deseja gravar as categorias e as contas actuais?");
+        if (save) {
+            personalFinanceManager.saveData();
+        } else {
+            System.out.println("Os dados não foram gravados.");
+        }
+        System.out.println("A terminar sessão...");
     }
 
     public void menuAnalise(String option) {
@@ -109,10 +129,17 @@ public class PersonalFinanceManagerUserInterface {
                 if (accId != null) {
                     long accIdSelected = Long.parseLong(accId);
                     String optionCategory = mainMenu.requestSelection("Escolha a categoria para consultar", personalFinanceManager.getArrayCategories());
-                    personalFinanceManager.categoryEstimationMonth(accIdSelected, personalFinanceManager.getCategoryByName(optionCategory));
+                    if (optionCategory != null) {
+                        personalFinanceManager.categoryEstimationMonth(accIdSelected, personalFinanceManager.getCategoryByName(optionCategory));
+                    }
                 }
                 break;
             case (OPT_ANUAL_INTEREST):
+                String accountId = mainMenu.requestSelection("Escolha uma conta para consultar", personalFinanceManager.getArrayIds());
+                if (accountId != null) {
+                    long accIdSelected = Long.parseLong(accountId);
+                    personalFinanceManager.annualInterestEstimation(accIdSelected);
+                }
                 break;
             default:
                 break;
